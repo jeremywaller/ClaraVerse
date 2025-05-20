@@ -199,3 +199,22 @@ npm run electron:build     # Desktop
 Clara gives you the full local AI stack — no vendor lock-in, no API hell, no GPU bills.
 
 **Clara’s your rocket. Light it up. 🚀**
+
+---
+
+## 🔑 Keycloak Integration
+
+The backend now supports authentication via [Keycloak](https://www.keycloak.org/).
+Set the following environment variables before starting the backend:
+
+```
+KEYCLOAK_URL=http://localhost:8080/
+KEYCLOAK_REALM=clara
+KEYCLOAK_CLIENT_ID=clara-backend
+KEYCLOAK_CLIENT_SECRET=<client secret>
+KEYCLOAK_ADMIN_USER=<admin user>
+KEYCLOAK_ADMIN_PASSWORD=<admin password>
+```
+
+The frontend uses `keycloak-js` to handle login. Configure matching variables in
+a `.env` file (e.g. `VITE_KEYCLOAK_URL`, `VITE_KEYCLOAK_REALM`, `VITE_KEYCLOAK_CLIENT_ID`).

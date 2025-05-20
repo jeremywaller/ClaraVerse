@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Bell, Sun, Moon, Monitor, Clock } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 import UserProfileButton from './common/UserProfileButton';
+import Login from './Login';
+import { useAuth } from '../contexts/AuthContext';
 import { db } from '../db';
 
 interface TopbarProps {
@@ -13,6 +15,7 @@ interface TopbarProps {
 
 const Topbar = ({ userName, onPageChange, projectTitle, showProjectTitle = false }: TopbarProps) => {
   const { theme, setTheme, isDark } = useTheme();
+  const { authenticated } = useAuth();
   const [now, setNow] = useState(new Date());
   const [timezone, setTimezone] = useState<string>(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
@@ -68,6 +71,7 @@ const Topbar = ({ userName, onPageChange, projectTitle, showProjectTitle = false
           userName={userName || 'Profile'}
           onPageChange={onPageChange || (() => {})}
         />
+        {!authenticated && <Login />}
       </div>
     </div>
   );
