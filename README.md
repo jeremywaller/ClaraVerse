@@ -138,6 +138,16 @@ Organize your generations with tags, thumbnails, and metadata.
 
 > ✅ **Only Prerequisite**: [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
+Run the full stack locally with Docker Compose:
+
+```bash
+git clone https://github.com/badboysm890/ClaraVerse.git
+cd ClaraVerse
+docker compose up --build
+```
+
+Open your browser at [http://localhost:8069](http://localhost:8069) once all services are up.
+
 ---
 
 ## 💻 Download Desktop App
