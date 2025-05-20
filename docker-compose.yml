@@ -1,0 +1,155 @@
+services:
+  # Main Clara frontend application
+  # All services have resource limits defined to prevent resource exhaustion
+  clara-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: clara-app:latest
+    container_name: clara_app
+    ports:
+      - "8069:8069"
+    depends_on:
+      - clara-backend
+      - clara-interpreter
+      - clara-n8n
+      - clara-ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    networks:
+      - clara_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8069"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Python backend service
+  clara-backend:
+    build:
+      context: ./py_backend
+      dockerfile: Dockerfile
+    image: clara-backend:latest
+    container_name: clara_python
+    ports:
+      - "5001:5000"
+    volumes:
+      - clara_data:/root/.clara
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OLLAMA_BASE_URL=http://clara_ollama:11434
+    depends_on:
+      - clara-ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - clara_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Clara Interpreter service
+  clara-interpreter:
+    image: clara17verse/clara-interpreter:latest
+    container_name: clara_interpreter
+    ports:
+      - "8000:8000"
+    volumes:
+      - clara_interpreter_data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OLLAMA_BASE_URL=http://clara_ollama:11434
+    depends_on:
+      - clara-ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '0.8'
+          memory: 1G
+    networks:
+      - clara_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # N8N Workflow automation service
+  clara-n8n:
+    image: n8nio/n8n:1.91.3
+    container_name: clara_n8n
+    ports:
+      - "5678:5678"
+    volumes:
+      - clara_n8n_data:/home/node/.n8n
+    environment:
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - N8N_HOST=clara-n8n
+      - WEBHOOK_URL=http://clara-n8n:5678/
+      - N8N_EDITOR_BASE_URL=http://clara-n8n:5678/
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - clara_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Ollama service for local AI models
+  clara-ollama:
+    image: ollama/ollama:0.7.0
+    container_name: clara_ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - clara_ollama_data:/root/.ollama
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+    networks:
+      - clara_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+networks:
+  clara_network:
+    driver: bridge
+
+volumes:
+  clara_data:
+    driver: local
+  clara_interpreter_data:
+    driver: local
+  clara_n8n_data:
+    driver: local
+  clara_ollama_data:
+    driver: local
