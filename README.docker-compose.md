@@ -33,8 +33,8 @@ The docker-compose.yml file is configured to build the required ClaraVerse image
 - `clara-backend`: Python backend service built from the py_backend/Dockerfile
 
 External services are pulled from Docker Hub:
-- `clara-interpreter`: Pulled from clara17verse/clara-interpreter:1.0.0
-- `clara-n8n`: Pulled from n8nio/n8n:0.234.0
+- `clara-interpreter`: Pulled from clara17verse/clara-interpreter:latest
+- `clara-n8n`: Pulled from n8nio/n8n:1.91.3
 - `clara-ollama`: Pulled from ollama/ollama:0.7.0
 
 ## Services
