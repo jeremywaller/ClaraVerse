@@ -12,8 +12,8 @@ This guide helps you set up and run ClaraVerse and all its services using Docker
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/clara17verse/clara.git
-   cd clara
+   git clone https://github.com/jeremywaller/ClaraVerse.git
+   cd ClaraVerse
    ```
 
 2. Start all services:
@@ -112,6 +112,6 @@ To modify ports or add custom environment variables, edit the `docker-compose.ym
 
 ## Resources
 
-- [ClaraVerse Documentation](https://github.com/clara17verse/clara/docs)
+- [ClaraVerse Documentation](https://github.com/jeremywaller/ClaraVerse)
 - [Ollama Documentation](https://github.com/ollama/ollama)
 - [N8N Documentation](https://docs.n8n.io/)
