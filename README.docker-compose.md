@@ -33,21 +33,21 @@ The docker-compose.yml file is configured to build the required ClaraVerse image
 - `clara-backend`: Python backend service built from the py_backend/Dockerfile
 
 External services are pulled from Docker Hub:
-- `clara-interpreter`: Pulled from clara17verse/clara-interpreter:latest
-- `clara-n8n`: Pulled from n8nio/n8n:latest
-- `clara-ollama`: Pulled from ollama/ollama:latest
+- `clara-interpreter`: Pulled from clara17verse/clara-interpreter:1.0.0
+- `clara-n8n`: Pulled from n8nio/n8n:0.234.0
+- `clara-ollama`: Pulled from ollama/ollama:0.7.0
 
 ## Services
 
 The docker-compose.yml file includes the following services:
 
-| Service | Description | Port | Container Name |
-|---------|-------------|------|---------------|
-| clara-app | Main ClaraVerse UI | 8069 | clara_app |
-| clara-backend | Python backend for file handling, RAG, etc. | 5001 | clara_python |
-| clara-interpreter | Code interpreter service | 8000 | clara_interpreter |
-| clara-n8n | N8N workflow automation | 5678 | clara_n8n |
-| clara-ollama | Ollama for running local AI models | 11434 | clara_ollama |
+| Service | Description | Port Mapping | Container Name |
+|---------|-------------|-------------|---------------|
+| clara-app | Main ClaraVerse UI | 8069:8069 | clara_app |
+| clara-backend | Python backend for file handling, RAG, etc. | 5001:5000 | clara_python |
+| clara-interpreter | Code interpreter service | 8000:8000 | clara_interpreter |
+| clara-n8n | N8N workflow automation | 5678:5678 | clara_n8n |
+| clara-ollama | Ollama for running local AI models | 11434:11434 | clara_ollama |
 
 ## Volumes
 
@@ -109,6 +109,36 @@ If you encounter issues:
 ## Advanced Configuration
 
 To modify ports or add custom environment variables, edit the `docker-compose.yml` file before running `docker compose up -d`.
+
+### Environment Variables
+
+The following environment variables can be adjusted in the docker-compose.yml file:
+
+| Service | Variable | Description |
+|---------|----------|-------------|
+| clara-backend | PYTHONUNBUFFERED | Ensures Python output is sent directly to container logs |
+| clara-backend | OLLAMA_BASE_URL | URL for connecting to the Ollama API service |
+| clara-interpreter | PYTHONUNBUFFERED | Ensures Python output is sent directly to container logs |
+| clara-interpreter | OLLAMA_BASE_URL | URL for connecting to the Ollama API service |
+| clara-n8n | N8N_PORT | Port on which N8N will listen |
+| clara-n8n | N8N_PROTOCOL | Protocol for N8N connections (http/https) |
+| clara-n8n | N8N_HOST | Hostname for N8N service |
+| clara-n8n | WEBHOOK_URL | URL for webhook callbacks |
+| clara-n8n | N8N_EDITOR_BASE_URL | Base URL for the N8N editor UI |
+
+### Resource Limits
+
+All services have CPU and memory limits configured to prevent resource exhaustion:
+
+| Service | CPU Limit | Memory Limit |
+|---------|-----------|--------------|
+| clara-app | 1.0 | 1GB |
+| clara-backend | 0.5 | 512MB |
+| clara-interpreter | 0.8 | 1GB |
+| clara-n8n | 0.5 | 512MB |
+| clara-ollama | 2.0 | 4GB |
+
+These limits can be adjusted in the docker-compose.yml file based on your system capabilities.
 
 ## Resources
 
