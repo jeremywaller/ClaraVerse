@@ -572,7 +572,13 @@ class DockerSetup extends EventEmitter {
             installMessage = 'install Docker Engine';
             break;
         }
-        const errorMessage = `Docker is not running. Please ${installMessage} from:\n${dockerDownloadLink}\n\nAfter installing and starting Docker, please restart Clara.`;
+        // Add Linux-specific instructions for Docker group permissions
+        let permissionMessage = '';
+        if (process.platform === 'linux') {
+          permissionMessage = '\n\nNOTE: On Linux, make sure your user is in the "docker" group:\n  sudo usermod -aG docker $USER\nThen log out and back in, or run "newgrp docker" to apply changes.';
+        }
+        
+        const errorMessage = `Docker is not running. Please ${installMessage} from:\n${dockerDownloadLink}${permissionMessage}\n\nAfter installing and starting Docker, please restart Clara.`;
         statusCallback(errorMessage, 'error');
         throw new Error(errorMessage);
       }
