@@ -12,12 +12,19 @@ from contextlib import contextmanager
 from fastapi import FastAPI, HTTPException, Request, File, UploadFile, Form, Depends, Query
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Header
 import tempfile
 import shutil
 from pathlib import Path
 from typing import List, Optional, Dict, Any
 import json
 from pydantic import BaseModel
+from keycloak_utils import (
+    verify_token,
+    create_user as kc_create_user,
+    assign_realm_role,
+    get_users as kc_get_users,
+)
 
 # Import our DocumentAI class
 from ragDbClara import DocumentAI
@@ -268,6 +275,17 @@ class SearchRequest(BaseModel):
 class CollectionCreate(BaseModel):
     name: str
     description: Optional[str] = None
+
+
+class UserCreate(BaseModel):
+    username: str
+    email: str
+    password: str
+
+
+class RoleAssign(BaseModel):
+    user_id: str
+    role: str
 
 @app.get("/")
 def read_root():
@@ -851,6 +869,31 @@ async def transcribe_audio(
         logger.error(f"Error transcribing audio: {e}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"Error transcribing audio: {str(e)}")
+
+
+# ----------------- User management endpoints -----------------
+
+@app.post("/users")
+def create_user_endpoint(user: UserCreate, authorization: str = Header(...)):
+    token = authorization.split(" ")[-1]
+    verify_token(token)
+    kc_create_user(user.username, user.email, user.password)
+    return {"status": "user_created", "username": user.username}
+
+
+@app.get("/users")
+def list_users(authorization: str = Header(...)):
+    token = authorization.split(" ")[-1]
+    verify_token(token)
+    return kc_get_users()
+
+
+@app.post("/users/assign-role")
+def assign_role_endpoint(req: RoleAssign, authorization: str = Header(...)):
+    token = authorization.split(" ")[-1]
+    verify_token(token)
+    assign_realm_role(req.user_id, req.role)
+    return {"status": "role_assigned"}
 
 # Handle graceful shutdown
 def handle_exit(signum, frame):
