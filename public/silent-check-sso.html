@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Silent SSO Check</title>
+    <script>
+        // This file is a part of the Keycloak silent SSO check
+        // It communicates with the Keycloak iframe to maintain login state
+        parent.postMessage(window.location.href, window.location.origin);
+    </script>
+</head>
+<body>
+    <!-- Intentionally left empty -->
+</body>
+</html>
